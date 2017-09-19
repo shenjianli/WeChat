@@ -4,7 +4,7 @@ import time
 import xlrd
 import datetime
 import threading
-
+import UserDB
 # http://www.liuxue86.com/a/3151933.html
 
 wechat = "WeChat.xlsx"
@@ -37,42 +37,6 @@ sleep_min = 0 #睡觉时间
 def not_empty(s):
     return s and s.strip()
 
-bk = xlrd.open_workbook(wechat)
-try:
-    sh = bk.sheet_by_index(0)
-    # 获取行数
-    nrows = sh.nrows
-    # 获取列数
-    ncols = sh.ncols
-    print("nrows %d, ncols %d" % (nrows, ncols))
-    signInList = sh.col_values(0)
-    getUpList = sh.col_values(1)
-    lunchList = sh.col_values(2)
-    signOutList = sh.col_values(3)
-    offworkList = sh.col_values(4)
-    extraworkList = sh.col_values(5)
-    sleepList = sh.col_values(6)
-except:
-    print("no sheet in %s named Sheet1" % wechat)
-
-getUpList.pop(0)
-signInList.pop(0)
-lunchList.pop(0)
-signOutList.pop(0)
-offworkList.pop(0)
-extraworkList.pop(0)
-sleepList.pop(0)
-
-getUpList = list(filter(not_empty, getUpList))
-signInList = list(filter(not_empty, signInList))
-lunchList = list(filter(not_empty, lunchList))
-signOutList = list(filter(not_empty, signOutList))
-offworkList = list(filter(not_empty, offworkList))
-extraworkList = list(filter(not_empty, extraworkList))
-sleepList = list(filter(not_empty, sleepList))
-print(getUpList,signInList,lunchList,signOutList,offworkList,extraworkList,sleepList)
-
-
 # 自动回复
 # 封装好的装饰器，当接收到的消息是Text，即文字消息
 @itchat.msg_register('Text')
@@ -91,14 +55,17 @@ def text_reply(msg):
 
 # 起床
 def notifyGetup():
+    user_db = UserDB.query_user_data()
+    users = user_db['data']
+    print(users)
     print("一天之际在于晨，起床啦")
-    notifyWechat('一天之际在于晨，起床啦',getUpList)
+    notifyWechat('一天之际在于晨，起床啦', getUpList)
     notifyMyself('骚年，上班啦，记得签到啊！')
 
 # 签到
 def notifySign():
     print("骚年，上班啦，记得签到啊！")
-    notifyWechat("【微信提醒】骚年，上班啦，记得签到,打卡啊！",signInList)
+    notifyWechat("【微信提醒】骚年，上班啦，记得签到,打卡啊！", signInList)
     notifyMyself('骚年，上班啦，记得签到啊！')
 
 # 午饭
@@ -244,22 +211,29 @@ if __name__ == '__main__':
 
     itchat.run()'''
 
+    user_db = UserDB.query_user_data()
+    users = user_db['data']
+    for user in users:
+        print(user)
+        print()
+    print(users)
 
-    itchat.auto_login()
-
-    # 获取自己的UserName
-    myUserName = itchat.get_friends(update=True)[0]["UserName"]
-    # 向自己文件传输助手发消息
-    itchat.send(u"系统开始运行", 'filehelper')
-    print("系统开始运行")
-
-    # 创建线程
-    try:
-        thread1 = myThread(1, "Thread-1")
-        thread1.start()
-    except:
-        print("Error: 无法启动线程")
-
-    itchat.run()
+    # -----------------------
+    # itchat.auto_login()
+    #
+    # # 获取自己的UserName
+    # myUserName = itchat.get_friends(update=True)[0]["UserName"]
+    # # 向自己文件传输助手发消息
+    # itchat.send(u"系统开始运行", 'filehelper')
+    # print("系统开始运行")
+    #
+    # # 创建线程
+    # try:
+    #     thread1 = myThread(1, "Thread-1")
+    #     thread1.start()
+    # except:
+    #     print("Error: 无法启动线程")
+    #
+    # itchat.run()
 
     #tchat.send(u"系统退出运行", 'filehelper')
