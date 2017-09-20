@@ -89,16 +89,66 @@ def query_mysql_data():
 		results = cursor.fetchall()
 		for row in results:
 			joke_data = {}
+
 			joke_id = row[0]
 			joke_data['id'] = joke_id
+
 			joke_site = row[1]
 			joke_data['site'] = joke_site
+
 			joke_content = row[2]
 			if '<BR>' in joke_content:
 				joke_content = joke_content.replace("<BR>", "\n")
 			joke_data['content'] = joke_content
+
 			joke_date = row[3]
 			joke_data['date'] = joke_date
+
+			joke_chat = row[4]
+			joke_data['chat'] = joke_chat
+			joke_list.append(joke_data)
+			# 打印结果
+			print("id=%d,site=%s,content=%s,date=%s" %(joke_id, joke_site, joke_content, joke_date))
+		joke_item['code'] = 1
+		joke_item['msg'] = '查询成功'
+		joke_item['data'] = joke_list;
+		joke_item['jokes'] = joke_list
+	except:
+		print("Error: unable to fetch data")
+	return joke_item
+
+
+# 查询笑话数据，返回json对象
+def query_joke_data_desc():
+	joke_list = []
+	joke_item = {}
+	# SQL 查询语句
+	sql = "SELECT * FROM JOKE WHERE JOKE_CHAT = '0' ORDER BY JOKE_ID * 1 DESC"
+	try:
+		# 执行SQL语句
+		cursor.execute(sql)
+		# 获取所有记录列表
+		results = cursor.fetchall()
+		for row in results:
+			joke_data = {}
+
+			joke_id = row[0]
+			joke_data['id'] = joke_id
+
+			joke_site = row[1]
+			joke_data['site'] = joke_site
+
+			joke_content = row[2]
+			if '<BR>' in joke_content:
+				joke_content = joke_content.replace("<BR>", "\n")
+			joke_data['content'] = joke_content
+
+			joke_date = row[3]
+			joke_data['date'] = joke_date
+
+			joke_chat = row[4]
+			joke_data['chat'] = joke_chat
+
 			joke_list.append(joke_data)
 			# 打印结果
 			print("id=%d,site=%s,content=%s,date=%s" %(joke_id, joke_site, joke_content, joke_date))
@@ -244,6 +294,24 @@ def query_joke_data_count():
 	return count
 
 
+# 更新微信发送状态
+def update_chat_state(joke_id):
+	datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+	# SQL 插入语句
+	sql = """UPDATE JOKE SET JOKE_CHAT = '%s', JOKE_DATE = '%s' WHERE JOKE_ID = %d"""
+
+	try:
+		# 执行sql语句
+		cursor.execute(sql % ('1', datetime, joke_id))
+		# 提交到数据库执行
+		db.commit()
+		return True
+	except Exception:
+		# 如果发生错误则回滚
+		db.rollback()
+	return False
+
+
 # 主方法
 if __name__ == '__main__':
 
@@ -253,7 +321,9 @@ if __name__ == '__main__':
 
 	# create_mysql_table()
 	# insert_mysql_data("www.baidu.com","百度一下，就知道")
-	joke = query_mysql_data()
-	joke_json = json.dumps(joke, ensure_ascii=False)
-	print(joke_json)
-	close_joke_db()
+	update_chat_state(270)
+	# joke = query_joke_data_desc()
+	#
+	# joke_json = json.dumps(joke, ensure_ascii=False)
+	# print(joke_json)
+	# close_joke_db()

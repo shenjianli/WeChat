@@ -66,11 +66,11 @@ def insert_user_data(name, nick, hint):
 
 
 # 更新数据库内容
-def update_user_device_data(user_name, id):
+def update_user_data(user_name, id):
 
 	datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 	# SQL 插入语句
-	sql = """UPDATE task SET user_name = %s, user_date = %s WHERE user_id = %d"""
+	sql = """UPDATE user SET user_name = '%s', user_date = '%s' WHERE user_id = %d"""
 	try:
 		# 执行sql语句
 		cursor.execute(sql % (user_name, datetime, id))
@@ -147,15 +147,16 @@ def query_joke_data_count():
 # 主方法
 if __name__ == '__main__':
 
-	create_mysql_table()
-	insert_user_data("申哥", "jerry", "jerry 好")
-	insert_user_data("力哥", "jerry001", "jerry hello ")
-	insert_user_data("hao 哥", "jerry hao ", "jerry hi")
+	#create_mysql_table()
+	#insert_user_data("申哥", "shen", "jerry 好")
+
+	# insert_user_data("力哥", "jerry001", "jerry hello ")
+	# insert_user_data("hao 哥", "jerry hao ", "jerry hi")
 
 	count = query_joke_data_count()
 	print(count)
 
-	#update_task_data_by_id(3)
+	update_user_data("申哥", 1)
 	data = query_user_data()
 
 	user_json = json.dumps(data, ensure_ascii=False)

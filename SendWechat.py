@@ -1,10 +1,10 @@
 # coding=utf8
 import itchat
 import time
-import xlrd
 import datetime
 import threading
 import UserDB
+import JokeDB
 # http://www.liuxue86.com/a/3151933.html
 
 wechat = "WeChat.xlsx"
@@ -57,9 +57,10 @@ def text_reply(msg):
 def notifyGetup():
     user_db = UserDB.query_user_data()
     users = user_db['data']
+
     print(users)
     print("一天之际在于晨，起床啦")
-    notifyWechat('一天之际在于晨，起床啦', getUpList)
+    notify_wechat('一天之际在于晨，起床啦', getUpList)
     notifyMyself('骚年，上班啦，记得签到啊！')
 
 # 签到
@@ -99,15 +100,16 @@ def notifySleep():
     print("垂死病中惊坐起，今日到底星期几。抬望眼，卧槽，周一。低头，完了，十点。")
     notifyWechat('早睡早起，身体好，睡觉哇！',sleepList)
 
+
 # 向微信发送消息
-def notifyWechat(msg,person):
-    print(msg,person)
+def notify_wechat(msg, person):
+    print(msg, person)
     for p in person:
         if p == "":
             print("名字为空不进行发送")
         else:
             # 想给谁发信息，先查找到这个朋友
-            users = itchat.search_friends(name= p)
+            users = itchat.search_friends(name=p)
             # 找到UserName
             userName = users[0]['UserName']
             # 然后给他发消息
@@ -179,6 +181,21 @@ class myThread (threading.Thread):
                 time.sleep(60)
 
 
+# 向微信发送消息
+def notify_wechat_by_user(msg, user):
+
+    print(msg, user)
+    if user == "":
+            print("名字为空不进行发送")
+    else:
+        print("向---", user['name'], "---发送微信消息")
+        content = user['hint'] +'：\n'+ msg
+        # 想给谁发信息，先查找到这个朋友
+        users = itchat.search_friends(name=user['nick'])
+        # 找到UserName
+        user_name = users[0]['UserName']
+        # 然后给他发消息
+        itchat.send(content, toUserName=user_name)
 
 if __name__ == '__main__':
 
@@ -211,9 +228,25 @@ if __name__ == '__main__':
 
     itchat.run()'''
 
+    itchat.auto_login()
+
     user_db = UserDB.query_user_data()
+
+    joke_data = JokeDB.query_joke_data_desc()
+
+    jokes = joke_data['data']
+
+    joke = jokes[0]
+
+    joke_content = joke['content']
+    joke_id = joke['id']
+
+    JokeDB.update_chat_state(joke_id)
+
     users = user_db['data']
     for user in users:
+        notify_wechat_by_user(joke_content, user)
+        JokeDB.update_chat_state(joke_id)
         print(user)
         print()
     print(users)
@@ -237,3 +270,5 @@ if __name__ == '__main__':
     # itchat.run()
 
     #tchat.send(u"系统退出运行", 'filehelper')
+
+
