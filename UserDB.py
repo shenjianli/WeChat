@@ -148,15 +148,18 @@ def query_joke_data_count():
 if __name__ == '__main__':
 
 	#create_mysql_table()
-	#insert_user_data("申哥", "shen", "jerry 好")
 
-	# insert_user_data("力哥", "jerry001", "jerry hello ")
-	# insert_user_data("hao 哥", "jerry hao ", "jerry hi")
+	# insert_user_data("申建利", "shen", "jerry 好")
+	# insert_user_data("郝高龙", "郝青燕", "龙")
+	# insert_user_data("李志龙", "龙四", "龙四")
+	# insert_user_data("吴佳健", "吴佳健", "佳健")
+	# insert_user_data("阳阳", "明阳", "阳阳")
+	insert_user_data("王凯", "王老道", "凯凯")
 
 	count = query_joke_data_count()
 	print(count)
 
-	update_user_data("申哥", 1)
+	#update_user_data("申哥", 1)
 	data = query_user_data()
 
 	user_json = json.dumps(data, ensure_ascii=False)
